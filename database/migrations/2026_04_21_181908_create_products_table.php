@@ -21,11 +21,6 @@ return new class extends Migration
         });
     }
 
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
-    
     /**
      * Reverse the migrations.
      */

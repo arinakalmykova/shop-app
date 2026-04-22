@@ -19,10 +19,6 @@ return new class extends Migration
         });
     }
 
-
-    public function products(){
-        return $this->hasMany(Product::class);
-    }
     /**
      * Reverse the migrations.
      */
