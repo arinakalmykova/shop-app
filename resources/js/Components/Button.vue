@@ -1,5 +1,7 @@
 <template>
-    <button :type="type" @click="emit('click')">{{text}}</button>
+    <button :type="type" @click="emit('click')"  :class="customClass? customClass : baseClass">
+        <slot />
+    </button>
 </template>
 
 <script setup>
@@ -8,11 +10,13 @@
             type: String,
             default: 'submit',
         },
-        text: {
+        customClass: {
             type: String,
-            default: 'Submit',
+            default: "",
         },
     });
 
     const emit = defineEmits(['click']);
+
+    const baseClass = "px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-sm";
 </script>

@@ -17,7 +17,14 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with('category')->latest->pagination(10);
+        $query = Product::with('category')->latest();
+
+        if (request()->filled('category_id')) {
+            $query->where('category_id', request('category_id'));
+        }
+
+        $products = $query->paginate(10);
+
         return ProductResource::collection($products);
     }
 

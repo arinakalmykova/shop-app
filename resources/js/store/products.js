@@ -29,9 +29,10 @@ export const useProductsStore = defineStore('products', () => {
   const fetchProduct = async (id) => {
     loading.value = true;
     error.value = '';
+    product.value = null;
     try {
       const response = await axios.get(`/api/products/${id}`);
-      product.value = response.data;
+      product.value = response.data.data;
     } catch (e) {
       error.value = 'не удалось загрузить товар';
     } finally {
@@ -46,7 +47,7 @@ export const useProductsStore = defineStore('products', () => {
     });
   }
 
-  const updateProduct= async(data,id)=> {
+  const updateProduct= async(id, data)=> {
     const auth = useAuthStore();
     return axios.put(`/api/products/${id}`,data, {
         headers: auth.getAuthHeaders(),
