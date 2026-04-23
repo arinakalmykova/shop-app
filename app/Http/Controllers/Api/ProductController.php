@@ -25,17 +25,18 @@ class ProductController extends Controller
 
         if (request()->filled('search')) {
             $search = request('search');
+            $operator = config('database.default') === 'pgsql' ? 'ilike' : 'like';
 
-            $query->where(function ($query) use ($search) {
+            $query->where(function ($query) use ($search, $operator) {
                 $query
-                    ->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                    ->where('name', $operator, "%{$search}%")
+                    ->orWhere('description', $operator, "%{$search}%");
             });
         }
         if (request()->boolean('checkDeleted')) {
             $query->withTrashed();
         }
-        $products = $query->get();
+        $products = $query->paginate(10)->withQueryString();
 
         return ProductResource::collection($products);
     }

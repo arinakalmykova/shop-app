@@ -14,10 +14,12 @@ docker compose up --build
 Контейнер `app` сам выполнит:
 
 - `composer install`
-- создание `database/database.sqlite`
+- ожидание PostgreSQL-контейнера `db`
 - `php artisan migrate --force`
 - создание пользователя `admin@example.com` / `password`
 - заполнение товаров, если таблица `products` пустая
+
+Внутри Docker Laravel подключается к PostgreSQL по хосту `db`. В локальном `.env` для запуска без Docker можно оставлять `DB_HOST=127.0.0.1`.
 
 ## Повторный запуск
 

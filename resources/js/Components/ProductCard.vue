@@ -1,7 +1,7 @@
 <template>
     <div
         :key="product.id"
-        class="bg-white border border-border rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-200"
+        class="bg-white border border-border rounded-xl p-6 shadow-sm hover:shadow-lg flex flex-col h-full transition-shadow duration-200"
     >
         <div class="mb-4">
             <h3 class="text-gray-900 mb-2">{{ product.name }}</h3>

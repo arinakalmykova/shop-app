@@ -18,7 +18,7 @@ Route::get('/product/{product}', function (Product $product) {
 });
 
 Route::get('/admin/products', function () {
-    return Inertia::render('Home');
+    return Inertia::render('AdminProducts');
 });
 
 Route::get('/admin/products/create', function () {

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { useProductsApi } from '../composables/useProductsApi';
 
 export const useProductsStore = defineStore('products', () => {
@@ -9,15 +9,27 @@ export const useProductsStore = defineStore('products', () => {
   const error = ref('');
   const currentPage = ref(1);
   const lastPage = ref(1);
+  const perPage = ref(10);
+  const total = ref(0);
+  const from = ref(0);
+  const to = ref(0);
 
   const fetchProducts = async(params ={}) => {
     loading.value = true;
     error.value = '';
     try {
         const response = await useProductsApi().fetchProducts(params);
-        products.value=response.data.data;
-        currentPage.value=response.data?.meta?.current_page;
-        lastPage.value=response.data?.meta?.last_page;
+        const meta = response.data?.meta || {};
+
+        products.value = response.data.data;
+        currentPage.value = meta.current_page || 1;
+        lastPage.value = meta.last_page || 1;
+        perPage.value = meta.per_page || products.value.length;
+        total.value = meta.total || products.value.length;
+        from.value = meta.from || (products.value.length ? 1 : 0);
+        to.value = meta.to || products.value.length;
+
+        return response;
     } catch (e){
         error.value='не удалось загрузить товары';
     } finally {
@@ -64,6 +76,10 @@ export const useProductsStore = defineStore('products', () => {
     error,
     currentPage,
     lastPage,
+    perPage,
+    total,
+    from,
+    to,
     fetchProducts,
     fetchProduct,
     createProduct,

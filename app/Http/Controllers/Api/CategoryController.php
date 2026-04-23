@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Http\Resources\CategoryResourse;
+use App\Http\Resources\CategoryResource;
 
 class CategoryController extends Controller
 {
     public function index()
     {
         $category = Category::all();
-        return CategoryResourse::collection($category);
+        return CategoryResource::collection($category);
         
     }
 

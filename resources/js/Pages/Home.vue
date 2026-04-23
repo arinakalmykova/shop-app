@@ -41,28 +41,43 @@
             </div>
         </div>
         <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
-            <div v-for="product in filteredProducts" :key="product.id">
+            <div v-for="product in products" :key="product.id">
                 <ProductCard :product="product"></ProductCard>
             </div>
         </div>
-        <div class="flex justify-center">
-            <div class="flex gap-10 items-center">
+        <div class="flex flex-col items-center gap-4">
+            <p class="text-gray-600">
+                Показано {{ from }}-{{ to }} из {{ total }} товаров
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-3">
                 <Button
                     :disabled="currentPage === 1"
                     @click="prevPage"
-                    customClass="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-sm"
+                    customClass="px-5 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     Предыдущая
                 </Button>
-                <p>Страница {{ currentPage }} из {{ countPages }}</p>
+                <Button
+                    v-for="page in pages"
+                    :key="page"
+                    type="button"
+                    :disabled="page === currentPage"
+                    :customClass="page === currentPage
+                        ? 'px-4 py-3 bg-primary text-white rounded-xl shadow-sm'
+                        : 'px-4 py-3 bg-white text-gray-dark border border-border rounded-xl hover:text-primary transition-colors shadow-sm'"
+                    @click="goToPage(page)"
+                >
+                    {{ page }}
+                </Button>
                 <Button
                     :disabled="currentPage === lastPage"
                     @click="nextPage"
-                    customClass="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-sm"
+                    customClass="px-5 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     Следующая
                 </Button>
             </div>
+            <p class="text-gray-600">Страница {{ currentPage }} из {{ countPages }}</p>
         </div>
     </div>
 </template>
@@ -88,13 +103,14 @@ const loading = ref(false);
 const currentPage = ref(1);
 const search = ref('');
 const user = computed(() => useAuthStore().user);
-const countPages= computed(() => Math.ceil(products.value.length / 10));
-const filteredProducts = computed(() => {
-    const startIndex = (currentPage.value - 1) * 10;
-    const endIndex = startIndex + 10;
-    return products.value.slice(startIndex, endIndex);
-})
-
+const lastPage = computed(() => productsStore.lastPage || 1);
+const countPages = computed(() => lastPage.value);
+const total = computed(() => productsStore.total || 0);
+const from = computed(() => productsStore.from || 0);
+const to = computed(() => productsStore.to || 0);
+const pages = computed(() =>
+    Array.from({ length: lastPage.value }, (_, index) => index + 1)
+);
 
 const prevPage = () => {
     if (currentPage.value > 1) {
@@ -104,8 +120,15 @@ const prevPage = () => {
 };
 
 const nextPage = () => {
-    if (currentPage.value < countPages.value) {
+    if (currentPage.value < lastPage.value) {
         currentPage.value++;
+        fetchFilteredProducts();
+    }
+};
+
+const goToPage = (page) => {
+    if (page !== currentPage.value) {
+        currentPage.value = page;
         fetchFilteredProducts();
     }
 };
@@ -130,7 +153,9 @@ const fetchFilteredProducts = async () => {
         category_id: selectedCategory.value,
         search: search.value,
         checkDeleted: withTrash.value ? 1 : undefined,
+        page: currentPage.value,
     });
+    currentPage.value = productsStore.currentPage || 1;
 };
 
 watch(selectedCategory,() =>{
@@ -140,12 +165,13 @@ watch(selectedCategory,() =>{
 
 watch(withTrash, () => {
   currentPage.value = 1; 
-  fetchFilteredProducts
+  fetchFilteredProducts()
 });
 
 watch(search, async (value) => {
     clearTimeout(timeout);
     timeout = setTimeout(async () => {
+        currentPage.value = 1;
         await fetchFilteredProducts();
     }, 500);
 });
