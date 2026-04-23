@@ -10,12 +10,22 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!token.value)
 
+  const getAuthHeaders = () => {
+    if (!token.value) {
+      return {}
+    }
+
+    return {
+      Authorization: `Bearer ${token.value}`,
+    }
+  }
+
   const login = async (credentials) => {
     loading.value = true
     error.value = ''
 
     try {
-      const response = await useAuthApi().login('/api/login', credentials)
+      const response = await useAuthApi().login(credentials)
 
       token.value = response.data.token
       user.value = response.data.user
@@ -33,7 +43,7 @@ export const useAuthStore = defineStore('auth', () => {
   const logout = async () => {
     try {
       if (token.value) {
-        await axios.useAuthApi().logout();
+        await useAuthApi().logout()
       }
     } catch (e) {
     } finally {

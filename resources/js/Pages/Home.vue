@@ -41,8 +41,27 @@
             </div>
         </div>
         <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4">
-            <div v-for="product in products" :key="product.id">
+            <div v-for="product in filteredProducts" :key="product.id">
                 <ProductCard :product="product"></ProductCard>
+            </div>
+        </div>
+        <div class="flex justify-center">
+            <div class="flex gap-10 items-center">
+                <Button
+                    :disabled="currentPage === 1"
+                    @click="prevPage"
+                    customClass="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-sm"
+                >
+                    Предыдущая
+                </Button>
+                <p>Страница {{ currentPage }} из {{ countPages }}</p>
+                <Button
+                    :disabled="currentPage === lastPage"
+                    @click="nextPage"
+                    customClass="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-sm"
+                >
+                    Следующая
+                </Button>
             </div>
         </div>
     </div>
@@ -67,10 +86,29 @@ const categories = computed(() => categoriesStore.categories);
 const selectedCategory = ref("");
 const loading = ref(false);
 const currentPage = ref(1);
-const lastPage = ref(1);
 const search = ref('');
-
 const user = computed(() => useAuthStore().user);
+const countPages= computed(() => Math.ceil(products.value.length / 10));
+const filteredProducts = computed(() => {
+    const startIndex = (currentPage.value - 1) * 10;
+    const endIndex = startIndex + 10;
+    return products.value.slice(startIndex, endIndex);
+})
+
+
+const prevPage = () => {
+    if (currentPage.value > 1) {
+        currentPage.value--;
+        fetchFilteredProducts();
+    }
+};
+
+const nextPage = () => {
+    if (currentPage.value < countPages.value) {
+        currentPage.value++;
+        fetchFilteredProducts();
+    }
+};
 
 onMounted(async () => {
     await fetchFilteredProducts();
@@ -95,8 +133,15 @@ const fetchFilteredProducts = async () => {
     });
 };
 
-watch(selectedCategory, fetchFilteredProducts);
-watch(withTrash, fetchFilteredProducts);
+watch(selectedCategory,() =>{
+  currentPage.value = 1;
+ fetchFilteredProducts()
+ });
+
+watch(withTrash, () => {
+  currentPage.value = 1; 
+  fetchFilteredProducts
+});
 
 watch(search, async (value) => {
     clearTimeout(timeout);

@@ -47,6 +47,7 @@
       type="number"
       id="price"
       name="price"
+      min="10"
       v-model="form.price"
       required
     />
@@ -56,7 +57,7 @@
     </Error>
 
     <div class="flex gap-4">
-      <Button type="submit">
+      <Button type="submit" >
         {{ submitText }}
       </Button>
 

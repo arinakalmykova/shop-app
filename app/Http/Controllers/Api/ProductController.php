@@ -35,7 +35,7 @@ class ProductController extends Controller
         if (request()->boolean('checkDeleted')) {
             $query->withTrashed();
         }
-        $products = $query->paginate(10);
+        $products = $query->get();
 
         return ProductResource::collection($products);
     }

@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\LoginRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Laravel\Sanctum\Sanctum;
 
 class AuthController extends Controller
 {
@@ -34,9 +34,9 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout(LoginRequest $request): JsonResponse
+    public function logout(Request $request): JsonResponse
     {
-        $user = $request->user()->currentAccessToken()?->delete();
+        $request->user()?->currentAccessToken()?->delete();
 
         return response()->json([
             "message" => "Logout successful",
