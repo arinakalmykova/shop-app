@@ -19,5 +19,5 @@ defineProps({
 });
 
 const baseClass =
-  "inline-block px-6 py-3 bg-primary text-center text-white rounded-xl hover:bg-primary-dark transition-colors";
+  " w-full inline-block px-6 py-3 bg-primary text-center text-white rounded-xl hover:bg-primary-dark transition-colors";
 </script>

@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import axios from 'axios';
-import {useAuthStore} from './auth';
+import { useProductsApi } from '../composables/useProductsApi';
 
 export const useProductsStore = defineStore('products', () => {
   const products = ref([]);
@@ -15,7 +14,7 @@ export const useProductsStore = defineStore('products', () => {
     loading.value = true;
     error.value = '';
     try {
-        const response = await axios.get('/api/products', {params});
+        const response = await useProductsApi().fetchProducts(params);
         products.value=response.data.data;
         currentPage.value=response.data?.meta?.current_page;
         lastPage.value=response.data?.meta?.last_page;
@@ -31,7 +30,7 @@ export const useProductsStore = defineStore('products', () => {
     error.value = '';
     product.value = null;
     try {
-      const response = await axios.get(`/api/products/${id}`);
+      const response = await useProductsApi().fetchProduct(id);
       product.value = response.data.data;
     } catch (e) {
       error.value = 'не удалось загрузить товар';
@@ -41,27 +40,22 @@ export const useProductsStore = defineStore('products', () => {
   }
 
   const createProduct = async(data)=> {
-    const auth = useAuthStore();
-    return axios.post('/api/products',data, {
-        headers: auth.getAuthHeaders(),
-    });
+    return useProductsApi().createProduct(data);
   }
 
   const updateProduct= async(id, data)=> {
-    const auth = useAuthStore();
-    return axios.put(`/api/products/${id}`,data, {
-        headers: auth.getAuthHeaders(),
-    });
+    return useProductsApi().updateProduct(id, data);
   }
 
   const deleteProduct= async(id)=> {
-    const auth = useAuthStore();
-    await axios.delete(`/api/products/${id}`, {
-        headers: auth.getAuthHeaders(),
-    });
-
+    await useProductsApi().deleteProduct(id);
     products.value = products.value.filter((product) => product.id !== id);
   }
+
+  const restoreProduct = async (id) => {
+    await useProductsApi().restoreProduct(id);
+    await fetchProducts();
+  };
 
   return {
     products,
@@ -74,7 +68,8 @@ export const useProductsStore = defineStore('products', () => {
     fetchProduct,
     createProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    restoreProduct
   }
 
 })

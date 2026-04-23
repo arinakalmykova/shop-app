@@ -24,7 +24,8 @@
                 Вернуться к продуктам
             </Link>
             <Link :href = "`/admin/products/${product.id}/edit`" v-if="user">Редактировать</Link>
-            <Button type="submit" v-if="user" @click="deleteProduct">Удалить</Button>
+            <Button type="submit" v-if="user" @click="openModal(product.id)">Удалить</Button>
+            <ConfirmModal :show="showModal" @cancel="showModal = false" @confirm="deleteProduct(deleteId)"></ConfirmModal>
         </div>
     </div>
     <div v-else class="text-gray-500">Загрузка...</div>
@@ -32,12 +33,15 @@
 
 <script setup>
 import Link from "../Components/Link.vue";
-import {onMounted, computed} from "vue";
+import {onMounted, computed, ref} from "vue";
 import MainLayout from "../Layouts/MainLayout.vue";
 import {useProductsStore} from "../store/products";
 import {useAuthStore} from "../store/auth";
 import Button from "../Components/Button.vue";
+import ConfirmModal from "../Components/ConfirmModal.vue";
 
+const deleteId = ref(null);
+const showModal = ref(false);
 const user = computed(() => useAuthStore().user);
 const props = defineProps({
     product: Object,
@@ -47,7 +51,14 @@ defineOptions({
   layout: MainLayout,
 });
 
-const deleteProduct = async () => {
-    await useProductsStore().deleteProduct(props.product.id);
+const openModal = (id) => {
+    showModal.value = true;
+    deleteId.value = id;
 }
+const deleteProduct = async (id) => {
+    await useProductsStore().deleteProduct(id);
+    showModal.value = false;
+    window.location.href = '/';
+}
+
 </script>

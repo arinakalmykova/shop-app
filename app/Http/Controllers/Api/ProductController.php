@@ -23,6 +23,18 @@ class ProductController extends Controller
             $query->where('category_id', request('category_id'));
         }
 
+        if (request()->filled('search')) {
+            $search = request('search');
+
+            $query->where(function ($query) use ($search) {
+                $query
+                    ->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+        if (request()->boolean('checkDeleted')) {
+            $query->withTrashed();
+        }
         $products = $query->paginate(10);
 
         return ProductResource::collection($products);
@@ -68,6 +80,16 @@ class ProductController extends Controller
         $product->delete();
         return response()->json([
             "message" => "Product deleted successfully",
+        ]);
+    }
+
+    public function restore($id)
+    {
+        $product = Product::withTrashed()->findOrFail($id);
+        $product->restore();
+
+        return response()->json([
+            'message' => 'Product restored successfully',
         ]);
     }
 }

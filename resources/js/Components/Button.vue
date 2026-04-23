@@ -18,5 +18,5 @@
 
     const emit = defineEmits(['click']);
 
-    const baseClass = "px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-sm";
+    const baseClass = "w-full px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-dark transition-colors shadow-sm";
 </script>

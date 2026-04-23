@@ -2,41 +2,65 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Product;
 use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $categories = Category::all();
+        $this->call(CategorySeeder::class);
 
-        Product::insert([
-            [
-                'name' => 'iPhone 15',
-                'description' => 'Apple смартфон',
-                'price' => 99900,
-                'category_id' => $categories->where('name', 'Смартфоны')->first()->id,
-            ],
-            [
-                'name' => 'Samsung Galaxy S24',
-                'description' => 'Samsung смартфон',
-                'price' => 89900,
-                'category_id' => $categories->where('name', 'Смартфоны')->first()->id,
-            ],
-            [
-                'name' => 'MacBook Air',
-                'description' => 'Apple ноутбук',
-                'price' => 129900,
-                'category_id' => $categories->where('name', 'Ноутбуки')->first()->id,
-            ],
-            [
-                'name' => 'Наушники AirPods',
-                'description' => 'Беспроводные наушники',
-                'price' => 19900,
-                'category_id' => $categories->where('name', 'Аксессуары')->first()->id,
-            ],
-        ]);
+        Product::withTrashed()->forceDelete();
+
+        $categories = Category::pluck('id', 'name');
+
+        $products = [
+            ['iPhone 15', 'Apple смартфон с ярким OLED-экраном и быстрым процессором', 99900, 'Смартфоны'],
+            ['Samsung Galaxy S24', 'Флагманский Android-смартфон с качественной камерой', 89900, 'Смартфоны'],
+            ['Google Pixel 8', 'Смартфон с чистым Android и отличной обработкой фото', 74900, 'Смартфоны'],
+            ['Xiaomi 14', 'Производительный смартфон с быстрой зарядкой', 69900, 'Смартфоны'],
+            ['Nothing Phone 2', 'Смартфон с необычным дизайном и плавным интерфейсом', 59900, 'Смартфоны'],
+
+            ['MacBook Air 13', 'Легкий ноутбук Apple для учебы и работы', 129900, 'Ноутбуки'],
+            ['MacBook Pro 14', 'Мощный ноутбук Apple для разработки и монтажа', 219900, 'Ноутбуки'],
+            ['ASUS Zenbook 14', 'Компактный ноутбук с OLED-дисплеем', 96900, 'Ноутбуки'],
+            ['Lenovo ThinkPad E14', 'Надежный ноутбук для офиса и учебы', 84900, 'Ноутбуки'],
+            ['Acer Nitro 5', 'Игровой ноутбук с дискретной видеокартой', 109900, 'Ноутбуки'],
+
+            ['AirPods Pro 2', 'Беспроводные наушники с активным шумоподавлением', 24900, 'Аудио'],
+            ['Sony WH-1000XM5', 'Полноразмерные наушники с мощным шумоподавлением', 39900, 'Аудио'],
+            ['JBL Charge 5', 'Портативная колонка с влагозащитой', 15900, 'Аудио'],
+            ['Marshall Major IV', 'Беспроводные накладные наушники с долгой автономностью', 14900, 'Аудио'],
+            ['Яндекс Станция 2', 'Умная колонка для дома', 16900, 'Аудио'],
+
+            ['iPad Air', 'Планшет Apple для учебы, творчества и развлечений', 74900, 'Планшеты'],
+            ['iPad Pro 11', 'Профессиональный планшет с быстрым экраном', 119900, 'Планшеты'],
+            ['Samsung Galaxy Tab S9', 'Android-планшет с AMOLED-дисплеем', 89900, 'Планшеты'],
+            ['Xiaomi Pad 6', 'Доступный планшет с хорошей производительностью', 34900, 'Планшеты'],
+            ['Lenovo Tab P12', 'Большой планшет для мультимедиа и заметок', 42900, 'Планшеты'],
+
+            ['Apple Watch Series 9', 'Умные часы для уведомлений и тренировок', 45900, 'Аксессуары'],
+            ['Logitech MX Master 3S', 'Эргономичная беспроводная мышь', 11900, 'Аксессуары'],
+            ['Keychron K3', 'Низкопрофильная механическая клавиатура', 9900, 'Аксессуары'],
+            ['Anker PowerCore 20000', 'Внешний аккумулятор большой емкости', 6900, 'Аксессуары'],
+            ['Baseus GaN 65W', 'Компактное зарядное устройство для ноутбука и телефона', 4900, 'Аксессуары'],
+
+            ['LG UltraGear 27', 'Игровой монитор 27 дюймов с высокой частотой обновления', 34900, 'Мониторы'],
+            ['Dell UltraSharp U2723QE', 'Профессиональный 4K-монитор для работы с цветом', 69900, 'Мониторы'],
+            ['Samsung Odyssey G5', 'Изогнутый игровой монитор для динамичных игр', 31900, 'Мониторы'],
+            ['AOC 24G2SPU', 'Доступный игровой монитор 24 дюйма', 18900, 'Мониторы'],
+            ['Xiaomi Mi Curved 34', 'Широкоформатный монитор для работы и игр', 45900, 'Мониторы'],
+        ];
+
+        foreach ($products as [$name, $description, $price, $categoryName]) {
+            Product::create([
+                'name' => $name,
+                'description' => $description,
+                'price' => $price,
+                'category_id' => $categories[$categoryName],
+            ]);
+        }
     }
 }

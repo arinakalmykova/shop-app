@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import axios from 'axios';
+import { useAuthApi } from '../composables/useAuthApi';
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(JSON.parse(localStorage.getItem('user')) || null)
@@ -10,16 +10,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!token.value)
 
-  const getAuthHeaders = () => ({
-    Authorization: `Bearer ${token.value}`,
-  })
-
   const login = async (credentials) => {
     loading.value = true
     error.value = ''
 
     try {
-      const response = await axios.post('/api/login', credentials)
+      const response = await useAuthApi().login('/api/login', credentials)
 
       token.value = response.data.token
       user.value = response.data.user
@@ -37,9 +33,7 @@ export const useAuthStore = defineStore('auth', () => {
   const logout = async () => {
     try {
       if (token.value) {
-        await axios.post('/api/logout', {}, {
-          headers: getAuthHeaders(),
-        })
+        await axios.useAuthApi().logout();
       }
     } catch (e) {
     } finally {

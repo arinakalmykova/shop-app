@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import axios from 'axios'
+import { useCategoriesApi } from '../composables/useCategoriesApi'
 
 export const useCategoriesStore = defineStore('categories', () => {
   const categories = ref([])
@@ -12,7 +12,7 @@ export const useCategoriesStore = defineStore('categories', () => {
     error.value = ''
 
     try {
-      const response = await axios.get('/api/categories')
+      const response = await useCategoriesApi().fetchCategories()
       categories.value = response.data.data
     } catch (e) {
       error.value = 'Не удалось загрузить категории'
